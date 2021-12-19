@@ -1,0 +1,5 @@
+export const EXECUTE_CODE = 'EXECUTE_CODE';
+export const CODE_CHANGE = 'CODE_CHANGE';
+export const INPUT_CHANGE = 'INPUT_CHANGE';
+export const OUTPUT_CHANGE = 'OUTPUT_CHANGE';
+export const LANGUAGE_CHANGE = 'LANGUAGE_CHANGE';
