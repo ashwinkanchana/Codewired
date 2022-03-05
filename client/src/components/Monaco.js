@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import { styled } from '@mui/material/styles';
 import Editor from "@monaco-editor/react";
 import { useSelector, useDispatch } from 'react-redux';
 import { UPDATE_CODE } from '../actions/types';
@@ -205,16 +206,29 @@ export default function Monaco() {
     const handleCodeChange = (value, event) => {
         dispatch({ type: UPDATE_CODE, payload: value })
     }
+    const DrawerHeader = styled('div')(({ theme }) => ({
+        display: 'flex',
+        alignItems: 'center',
+        padding: theme.spacing(0),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+        justifyContent: 'flex-start',
+    }));
 
 
     return (
-        <Editor
-            height="90%"
-            theme="vs-dark"
-            defaultLanguage={IDE.language}
-            defaultValue={IDE.code}
-            onMount={handleEditorDidMount}
-            onChange={handleCodeChange}
-        />
+        <>
+        {/* <DrawerHeader /> */}
+            <Editor
+                height="80vh"
+                width="80vw"
+                theme="vs-dark"
+                defaultLanguage={IDE.language}
+                defaultValue={IDE.code}
+                onMount={handleEditorDidMount}
+                onChange={handleCodeChange}
+            />
+        </>
+        
     )
 }
