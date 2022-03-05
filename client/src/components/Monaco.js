@@ -1,8 +1,12 @@
 import React, { useRef } from 'react'
 import Editor from "@monaco-editor/react";
+import { useSelector, useDispatch } from 'react-redux';
+import { UPDATE_CODE } from '../actions/types';
 import { io } from 'socket.io-client'
 
-export default function Monaco({setCode}) {
+export default function Monaco() {
+    const IDE = useSelector(state => state.IDE);
+    const dispatch = useDispatch();
     const editorRef = useRef(null);
 
     const handleEditorDidMount = (editor, monaco) => {
@@ -197,18 +201,20 @@ export default function Monaco({setCode}) {
 
     }
 
-    const handleEditorChange = (value, event) => {
-        setCode(value)
+   
+    const handleCodeChange = (value, event) => {
+        dispatch({ type: UPDATE_CODE, payload: value })
     }
-    
+
+
     return (
         <Editor
-            height="100%"
+            height="90%"
             theme="vs-dark"
-            defaultLanguage="cpp"
-            defaultValue="// some comment"
+            defaultLanguage={IDE.language}
+            defaultValue={IDE.code}
             onMount={handleEditorDidMount}
-            onChange={handleEditorChange}
+            onChange={handleCodeChange}
         />
     )
 }

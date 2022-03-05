@@ -1,0 +1,56 @@
+[
+  {
+    "language": "c++",
+    "version": "10.2.0",
+    "aliases": ["cpp", "g++"],
+    "runtime": "gcc"
+  },
+  {
+    "language": "java",
+    "version": "15.0.2",
+    "aliases": []
+  },
+  {
+    "language": "python",
+    "version": "3.10.0",
+    "aliases": ["py", "py3", "python3", "python3.10"]
+  },
+  {
+    "language": "javascript",
+    "version": "16.3.0",
+    "aliases": ["node-javascript", "node-js", "javascript", "js"],
+    "runtime": "node"
+  },
+  {
+    "language": "go",
+    "version": "1.16.2",
+    "aliases": ["go", "golang"]
+  },
+  {
+    "language": "c",
+    "version": "10.2.0",
+    "aliases": ["gcc"],
+    "runtime": "gcc"
+  },
+  {
+    "language": "csharp",
+    "version": "6.12.0",
+    "aliases": ["mono", "mono-csharp", "mono-c#", "mono-cs", "c#", "cs"],
+    "runtime": "mono"
+  },
+  {
+    "language": "kotlin",
+    "version": "1.4.31",
+    "aliases": ["kt"]
+  },
+  {
+    "language": "swift",
+    "version": "5.3.3",
+    "aliases": ["swift"]
+  },
+  {
+    "language": "php",
+    "version": "8.0.2",
+    "aliases": ["php8", "html"]
+  }
+]
