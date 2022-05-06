@@ -5,6 +5,7 @@ import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import Code from './Code'
 import Whiteboard from './Whiteboard'
+import Whiteboardsocket from './Whiteboardsocket'
 import Grid from '@mui/material/Grid';
 import CodeIcon from '@mui/icons-material/Code';
 import GestureIcon from '@mui/icons-material/Gesture';
@@ -70,7 +71,8 @@ export default function BasicTabs() {
                         <Code />
                     </TabPanel>
                     <TabPanel value={value} index={1}>
-                        <Whiteboard />
+                        {/* <Whiteboard /> */}
+                        <Whiteboardsocket/>
                     </TabPanel>
                 </Grid>
 

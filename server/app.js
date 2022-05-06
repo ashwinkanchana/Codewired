@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import monaco from './socket/monaco.js';
 import chat from './socket/chat.js'
 import piston from './routes/piston.js'
+import room from './routes/room.js'
 
 const app = express()
 app.use(morgan('dev'))
@@ -38,15 +39,7 @@ monaco(io)
 chat(io)
 
 
-
-
-
-app.get('/', (req, res) => {
-    console.log('get')
-    res.send('hello')
-});
-
-
+app.use('/room', room)
 app.use('/code', piston)
 
 

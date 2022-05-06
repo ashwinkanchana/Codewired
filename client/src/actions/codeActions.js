@@ -1,4 +1,4 @@
-import codeServer from '../apis/code'
+import {codeServer} from '../utils/utils'
 import { REQUEST_EXECUTION, UPDATE_RUN } from './types'
 
 export const executeCode = (code, language, stdin) => async dispatch => {

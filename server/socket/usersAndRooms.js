@@ -1,4 +1,6 @@
-const users = [];
+const users = {};
+const rooms = {};
+
 
 const addUser = ({ id, name, room }) => {
     name = name.trim().toLowerCase();

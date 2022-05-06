@@ -1,7 +1,8 @@
-import { addUser, removeUser, getUser, getUsersInRoom } from './users.js';
+import { addUser, removeUser, getUser, getUsersInRoom } from './usersAndRooms.js';
 
 export default (io) => {
-    io.on('connect', (socket) => {
+
+    io.on('connection', (socket) => {
         socket.on('join', ({ name, room }, callback) => {
             const { error, user } = addUser({ id: socket.id, name, room });
 
@@ -17,6 +18,7 @@ export default (io) => {
             callback();
         });
 
+
         socket.on('sendMessage', (message, callback) => {
             const user = getUser(socket.id);
 
@@ -24,6 +26,7 @@ export default (io) => {
 
             callback();
         });
+
 
         socket.on('disconnect', () => {
             const user = removeUser(socket.id);
@@ -35,5 +38,3 @@ export default (io) => {
         })
     });
 }
-
-

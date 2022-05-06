@@ -27,6 +27,7 @@ export default (io) =>{
         }
         else
             socket.emit('userdata', Object.values(users))
+            
         socket.broadcast.emit('connected', { user: socket.user, color: socket.color })
 
         socket.on('selection', function (data) {
@@ -38,12 +39,10 @@ export default (io) =>{
             socket.broadcast.emit('resetdata', data)
         })
         socket.on('disconnect', function (data) {
-            //console.log('[Socket.IO] : disConnect ' + socket.id)
             socket.broadcast.emit("exit", users[socket.id].user)
             delete users[socket.id]
         })
         socket.on('key', function (data) {
-            //console.log(data)
             data.user = socket.user
             socket.broadcast.emit('key', data)
         })
