@@ -6,7 +6,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --experimental-json-modules app.js",
-    "start": "node --experimental-json-modules app.js"
+    "start": "node --experimental-json-modules app.js",
+    "client-install": "cd ./client && npm i --force",
+    "client-build": "cd ./client && npm run build",
+    "heroku-postbuild": "npm run client-install && npm run client-build"
   },
   "keywords": [],
   "author": "",

@@ -4,7 +4,7 @@ import piston from 'piston-client';
 import _ from 'lodash';
 
 const client = piston({ server: 'https://emkc.org' });
-import runtimes from '../config/runtimes.json';
+import runtimes from '../config/runtimes.json' assert {type: "json"};
 
 router.get('/runtimes', async (req, res) => {
     const runtimes = await client.runtimes();
