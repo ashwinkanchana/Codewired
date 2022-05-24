@@ -1,9 +1,11 @@
-import React from 'react'
-
+import React from "react";
+import {Box} from '@mui/material';
 function Chat() {
   return (
-    <div>Chat</div>
-  )
+    <Box sx={{ p: 2 }}>
+      <div>Chat</div>
+    </Box>
+  );
 }
 
-export default Chat
+export default Chat;

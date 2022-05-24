@@ -1,106 +1,32 @@
-// import React from 'react'
-// import PropTypes from 'prop-types';
-// import Tabs from '@mui/material/Tabs';
-// import Tab from '@mui/material/Tab';
-// import Box from '@mui/material/Box';
 import React, { useState } from "react";
 import {
   Box,
   Toolbar,
   List,
+  Paper,
   Typography,
   ListItem,
   ListItemButton,
   ListItemIcon,
+  Drawer,
+  Divider,
+  IconButton,
+  Tabs,
+  Tab,
+  Grid,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
-import { Code, Videocam, Gesture } from "@mui/icons-material";
-import {
-  styled,
-  useTheme,
-  ThemeProvider,
-  createTheme,
-} from "@mui/material/styles";
+import { Code, Videocam, Gesture, Chat, People } from "@mui/icons-material";
 
+import { styled, useTheme } from "@mui/material/styles";
+import { useSelector, useDispatch } from "react-redux";
+import { Menu, ChevronLeft, ChevronRight } from "@mui/icons-material";
 import CodeComponent from "./Code";
 import Whiteboard from "./Whiteboard";
 import Whiteboardsocket from "./Whiteboardsocket";
-import Grid from "@mui/material/Grid";
-
-// function TabPanel(props) {
-//     const { children, value, index, ...other } = props;
-
-//     return (
-//         <div
-//             role="tabpanel"
-//             hidden={value !== index}
-//             id={`simple-tabpanel-${index}`}
-//             aria-labelledby={`simple-tab-${index}`}
-//             {...other}
-//         >
-//             {value === index && (
-//                 <Box>
-//                     {children}
-//                 </Box>
-//             )}
-//         </div>
-//     );
-// }
-
-// TabPanel.propTypes = {
-//     children: PropTypes.node,
-//     index: PropTypes.number.isRequired,
-//     value: PropTypes.number.isRequired,
-// };
-
-// function a11yProps(index) {
-//     return {
-//         id: `simple-tab-${index}`,
-//         'aria-controls': `simple-tabpanel-${index}`,
-//     };
-// }
-
-// export default function BasicTabs() {
-//     const [value, setValue] = React.useState(0);
-
-//     const handleChange = (event, newValue) => {
-//         setValue(newValue);
-//     };
-
-//     return (
-//         <>
-//             <Grid container >
-//                 <Grid item xs={1}>
-//                     <Box
-//                         sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: '100%' }}>
-//                         <Tabs value={value}
-
-//                             orientation="vertical"
-//                             onChange={handleChange}
-//                             sx={{ borderRight: 1, borderColor: 'divider' }}>
-//                             <Tab icon={<CodeIcon fontSize="small" />} label="Code" aria-label="phone" {...a11yProps(0)} />
-//                             <Tab icon={<GestureIcon fontSize="small" />} label="Scribble" aria-label="favorite" {...a11yProps(1)} />
-//                         </Tabs>
-//                     </Box>
-//                 </Grid>
-//                 <Grid item xs={1} sm={11} md={11} lg={11} xl={11}>
-//                     <TabPanel value={value} index={0}>
-//                         <Code />
-//                     </TabPanel>
-//                     <TabPanel value={value} index={1}>
-//                         {/* <Whiteboard /> */}
-//                         <Whiteboardsocket/>
-//                     </TabPanel>
-//                 </Grid>
-
-//             </Grid>
-
-//         </>
-//     );
-// }
-
-
+import Meet from "./Meet";
+import RoomDrawerLayout from "./RoomDrawerLayout";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -143,13 +69,23 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
+const ChatDrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing(0),
+  // // necessary for content to be below app bar
+  // ...theme.mixins.toolbar,
+  zIndex: theme.zIndex.toolbar + 1,
+  justifyContent: "flex-start",
+}));
+
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
 }));
 
-const Drawer = styled(MuiDrawer, {
+const MiniDrawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme }) => ({
   flexShrink: 0,
@@ -160,24 +96,70 @@ const Drawer = styled(MuiDrawer, {
   "& .MuiDrawer-paper": closedMixin(theme),
 }));
 
-export default function MiniDrawer() {
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(0),
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginRight: -drawerWidth,
+    ...(open && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: 0,
+    }),
+  })
+);
+
+const drawerWidth = 360;
+
+export default function RoomWorkArea() {
   const theme = useTheme();
 
   const [tabValue, setTabValue] = useState(0);
 
+  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
+  const [chatDrawerTab, setChatDrawerTab] = React.useState(1);
+
+  const handleChatClickToggle = () => {
+    setChatDrawerTab(0);
+    setChatDrawerOpen((prev) => {
+      return !prev;
+    });
+  };
+
+  const handlePeopleClickToggle = () => {
+    setChatDrawerTab(1);
+    setChatDrawerOpen((prev) => {
+      return !prev;
+    });
+  };
+
+  const handleChatDrawerTabChange = (event, newValue) => {
+    setChatDrawerTab(newValue);
+  };
 
   return (
-    
+    <Paper>
       <Box sx={{ display: "flex" }}>
         <AppBar position="fixed" open={false}>
           <Toolbar>
-            <Typography variant="h6" noWrap component="div">
-              Mini variant drawer
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ flexGrow: 1 }}
+            >
+              Code
             </Typography>
           </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" open={false}>
-          <DrawerHeader/>
+        <MiniDrawer variant="permanent" open={false}>
+          <DrawerHeader />
 
           <List>
             <ListItem
@@ -223,7 +205,7 @@ export default function MiniDrawer() {
                     justifyContent: "center",
                   }}
                 >
-                  <Videocam />
+                  <Gesture />
                 </ListItemIcon>
               </ListItemButton>
             </ListItem>
@@ -246,13 +228,59 @@ export default function MiniDrawer() {
                     justifyContent: "center",
                   }}
                 >
-                  <Gesture />
+                  <Videocam />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+            <ListItem
+              onClick={() => handleChatClickToggle()}
+              disablePadding
+              sx={{ display: "block" }}
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Chat />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+            <ListItem
+              onClick={() => handlePeopleClickToggle()}
+              disablePadding
+              sx={{ display: "block" }}
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <People />
                 </ListItemIcon>
               </ListItemButton>
             </ListItem>
           </List>
-        </Drawer>
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        </MiniDrawer>
+        <Main open={chatDrawerOpen} sx={{ flexGrow: 1 }}>
           <TabPanel value={tabValue} index={0}>
             <CodeComponent />
           </TabPanel>
@@ -260,9 +288,39 @@ export default function MiniDrawer() {
             <Whiteboard />
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
-            <Whiteboardsocket />
+            <Meet />
           </TabPanel>
-        </Box>
+        </Main>
+        <Drawer
+          style={{ visibility: chatDrawerOpen ? "visible" : "hidden" }}
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+            },
+          }}
+          variant="persistent"
+          anchor="right"
+          open={chatDrawerOpen}
+        >
+          <ChatDrawerHeader>
+            <IconButton onClick={() => setChatDrawerOpen(false)}>
+              {theme.direction === "rtl" ? <ChevronLeft /> : <ChevronRight />}
+            </IconButton>
+            <Tabs
+              value={chatDrawerTab}
+              onChange={handleChatDrawerTabChange}
+              aria-label="basic tabs example"
+            >
+              <Tab label="Chat" />
+              <Tab label="Users" />
+            </Tabs>
+          </ChatDrawerHeader>
+          <Divider />
+          <RoomDrawerLayout value={chatDrawerTab} />
+        </Drawer>
       </Box>
+    </Paper>
   );
 }

@@ -9,8 +9,7 @@ import {
 
 const initState = {
     language: 'python',
-    code: `
-for i in range(0, 5):
+    code: `for i in range(0, 5):
     for j in range(0, i+1):
         print("* ",end="")
     print("\\r")`,
