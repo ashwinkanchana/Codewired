@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -10,10 +11,13 @@ import room from './routes/room.js'
 
 const app = express()
 app.use(morgan('dev'))
-const corsOptions = {
-    origin: '*'
-}
-app.use(cors(corsOptions))
+// const corsOptions = {
+//     origin: '*'
+// }
+// app.use(cors(corsOptions))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -24,7 +28,7 @@ app.use(express.urlencoded({
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origins: ["http://localhost:3000", "http://localhost:3001"],
+        origins: ["*"],
         methods: ["GET", "POST"],
         transports: ['websocket', 'polling'],
         credentials: true
@@ -42,6 +46,13 @@ chat(io)
 app.use('/room', room)
 app.use('/code', piston)
 
+
+if (process.env.NODE_ENV == "production") {
+    app.use(express.static("./client/build"));
+    app.get("*", (req, res) => {
+      res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+    });
+  }
 
 const port = process.env.PORT || 4001
 httpServer.listen(port, () => {

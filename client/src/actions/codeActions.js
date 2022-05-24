@@ -1,4 +1,4 @@
-import {codeServer} from '../utils/utils'
+import axios from '../api'
 import { REQUEST_EXECUTION, UPDATE_RUN } from './types'
 
 export const executeCode = (code, language, stdin) => async dispatch => {
@@ -8,7 +8,7 @@ export const executeCode = (code, language, stdin) => async dispatch => {
     })
     var res = { data: [] };
     try {
-        res = await codeServer.post('/execute', {
+        res = await axios.post('/code/execute', {
             code, language, stdin
         });
         await dispatch({

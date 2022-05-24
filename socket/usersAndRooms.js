@@ -1,5 +1,5 @@
-const users = {};
-const rooms = {};
+const users = [];
+const rooms = [];
 
 
 const addUser = ({ id, name, room }) => {
