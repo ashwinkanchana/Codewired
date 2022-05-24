@@ -113,8 +113,7 @@ export default function PersistentDrawerRight() {
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <CssBaseline />
-            <AppBar position="fixed" open={open}>
+            {/* <AppBar position="fixed" open={open}>
                 <Toolbar variant="dense">
                     <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
                         Code
@@ -131,7 +130,7 @@ export default function PersistentDrawerRight() {
                         <MenuIcon />
                     </IconButton>
                 </Toolbar>
-            </AppBar>
+            </AppBar> */}
             <Main open={open}>
                 <DrawerHeader />
                 <RoomWorkArea />
