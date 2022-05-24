@@ -1,5 +1,5 @@
 import React from 'react'
-import Monaco from './Monaco';
+import Monaco from '../Monaco';
 import Split from 'react-split'
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -7,9 +7,13 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { Fab } from '@mui/material';
 import { PlayArrow, Cached } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
-import { UPDATE_CODE, UPDATE_STDIN, UPDATE_LANGUAGE } from '../actions/types';
-import { executeCode } from '../actions/codeActions';
-import '../styles/io.css'
+import { UPDATE_CODE, UPDATE_STDIN, UPDATE_LANGUAGE } from '../../actions/types';
+import { executeCode } from '../../actions/codeActions';
+
+import {InputLabel, MenuItem,FormControl, Select } from '@mui/material';
+
+
+import './style.css'
 
 export default function Code(){
     const IDE_state = useSelector(state => state.IDE);
@@ -32,6 +36,8 @@ export default function Code(){
         dispatch(executeCode(IDE_state.code, IDE_state.language, IDE_state.stdin))
     }
 
+    
+
     const textAreaStyle = {
         color: 'white',
         // width: '100%',
@@ -50,6 +56,22 @@ export default function Code(){
 
 
                 <Stack>
+                <FormControl variant="standard">
+                        <InputLabel id="lang-select-label">Language</InputLabel>
+                        <Select
+                            labelId="lang-select-label"
+                            id="lang-select"
+                            value={IDE_state.language}
+                            label="Language"
+                            onChange={handleLanguageChange}
+                        >
+                            <MenuItem value={'C++'}>C++</MenuItem>
+                            <MenuItem value={'Java'}>Java</MenuItem>
+                            <MenuItem value={'Python'}>Python</MenuItem>
+                            <MenuItem value={'JavaScript'}>JavaScript</MenuItem>
+                        </Select>
+                    </FormControl>
+
 
                     <Typography variant="overline" display="block" gutterBottom>
                         Input

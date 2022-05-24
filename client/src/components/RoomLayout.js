@@ -17,12 +17,7 @@ import RoomDrawerLayout from './RoomDrawerLayout'
 import RoomWorkArea from './RoomWorkArea';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-// select
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-// select
+
 
 
 import { UPDATE_LANGUAGE } from '../actions/types';
@@ -96,9 +91,7 @@ export default function PersistentDrawerRight() {
 
     const drawerRef = useRef(null);
 
-    const handleLanguageChange = (event) => {
-        dispatch({ type: UPDATE_LANGUAGE, payload: event.target.value })
-    }
+   
 
 
     const theme = useTheme();
@@ -124,25 +117,10 @@ export default function PersistentDrawerRight() {
             <AppBar position="fixed" open={open}>
                 <Toolbar variant="dense">
                     <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
-                        Project
+                        Code
                     </Typography>
 
-                    <FormControl variant="standard">
-                        <InputLabel id="lang-select-label">Language</InputLabel>
-                        <Select
-                            labelId="lang-select-label"
-                            id="lang-select"
-                            value={IDE_state.language}
-                            label="Language"
-                            onChange={handleLanguageChange}
-                        >
-                            <MenuItem value={'C++'}>C++</MenuItem>
-                            <MenuItem value={'Java'}>Java</MenuItem>
-                            <MenuItem value={'Python'}>Python</MenuItem>
-                            <MenuItem value={'JavaScript'}>JavaScript</MenuItem>
-                        </Select>
-                    </FormControl>
-
+                   
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"

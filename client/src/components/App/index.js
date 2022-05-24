@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import RoomLayout from './RoomLayout'
-import '../styles/App.css'
+import RoomLayout from '../RoomLayout'
+import './style.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Join from './Join';
-import { getsocketIoInstance } from "../utils/socketio-client";
+import Join from '../Join';
+import { getsocketIoInstance } from "../../utils/socketio-client";
 
 let memberElems;
 
@@ -59,7 +59,7 @@ export default function App() {
                 <h6>These users have access to this Workspace</h6>
                 {memberElems}
             </div> */}
-            }
+            
 
             <ToastContainer limit={3} />
         </div>
