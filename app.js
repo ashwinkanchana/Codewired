@@ -1,3 +1,4 @@
+import * as path from 'path';
 import './config/config.js'
 import express from 'express';
 import cors from 'cors';
