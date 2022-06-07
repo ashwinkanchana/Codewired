@@ -1,51 +1,55 @@
-var conId = 1
-var colors = [
-    '#C0665F', '#C0975F', '#159D59', '#A408AC', '#94023B', '#029489'
-]
-var users = {}
+import ACTIONS from './actions.js'
+const userSocketMap = {};
 
+export default (io) => {
+  function getAllConnectedClients(roomId) {
+    // get allconnected users in that room (socket adapter)
+    return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
+      (socketId) => {
+        return {
+          socketId,
+          username: userSocketMap[socketId],
+        };
+      }
+    );
+  }
+  io.on("connection", (socket) => {
+    console.log("socket connected", socket.id); // browser socket id
 
+    socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
+      // join emitted event listen here
+      userSocketMap[socket.id] = username; // { 'socket_id': 'usrname' }
+      socket.join(roomId); // join room
+      const clients = getAllConnectedClients(roomId); // [{ socketId: '', username: '' }, {}, {}. ...]
+      clients.forEach(({ socketId }) => {
+        io.to(socketId).emit(ACTIONS.JOINED, {
+          // to each client in array
+          clients,
+          username,
+          socketId: socket.id,
+        });
+      });
+    });
 
+    socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+      socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+    });
 
-export default (io) =>{
-    io.on("connection", function (socket) {
-        //console.log('conn')
-        users[socket.id] = {}
+    socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
+      io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+    });
 
-        users[socket.id].user = socket.user = "user" + conId
-        users[socket.id].admin = socket.admin = false
-        users[socket.id].color = socket.color = colors[conId % colors.length]
-
-
-        conId++
-        //console.log('[Socket.IO] : Connect ' + socket.id)
-        if (io.sockets.length == 1) {
-            socket.emit('admin')
-            socket.admin = true
-
-
-        }
-        else
-            socket.emit('userdata', Object.values(users))
-            
-        socket.broadcast.emit('connected', { user: socket.user, color: socket.color })
-
-        socket.on('selection', function (data) {
-            data.color = socket.color
-            data.user = socket.user
-            socket.broadcast.emit('selection', data)
-        })
-        socket.on('filedata', function (data) {
-            socket.broadcast.emit('resetdata', data)
-        })
-        socket.on('disconnect', function (data) {
-            socket.broadcast.emit("exit", users[socket.id].user)
-            delete users[socket.id]
-        })
-        socket.on('key', function (data) {
-            data.user = socket.user
-            socket.broadcast.emit('key', data)
-        })
-    })
-
-}
+    socket.on("disconnecting", () => {
+      const rooms = [...socket.rooms];
+      rooms.forEach((roomId) => {
+        socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+          // notify on disconnect
+          socketId: socket.id,
+          username: userSocketMap[socket.id],
+        });
+      });
+      delete userSocketMap[socket.id];
+      socket.leave();
+    });
+  });
+};

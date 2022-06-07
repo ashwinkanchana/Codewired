@@ -12,3 +12,16 @@ export const getsocketIoInstance = (roomName, userName, componentName = '') => {
     }
     return socketIoInstance;
 }
+
+
+// socket initialization
+export const initSocket = async() => {
+    const options = {
+        'force new connection': true,
+        reconnectionAttempt: 'Infinity',
+        timeout: 10000,
+        transports: ['websocket']
+    };
+    console.log('initSocket backendUrl', backendUrl)
+    return socketIOClient(backendUrl, options);
+};

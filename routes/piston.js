@@ -1,5 +1,5 @@
 import express from 'express';
-var router = express.Router()
+const router = express.Router()
 import piston from 'piston-client';
 import _ from 'lodash';
 

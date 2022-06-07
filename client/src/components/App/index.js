@@ -1,31 +1,24 @@
-import React, { useState } from "react";
-import RoomLayout from "../RoomLayout";
+import React, { useEffect, useState } from "react";
+
 import "./style.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Join from "../Join";
 import { getsocketIoInstance } from "../../utils/socketio-client";
-import {
-  styled,
-  useTheme,
-  ThemeProvider,
-  createTheme,
-} from "@mui/material/styles";
-let memberElems;
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import { Routes, Route, Navigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 export default function App() {
-  const [verified, setVerified] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-
+  useEffect(() => {});
   return (
-    <ThemeProvider theme={darkTheme}>
-      <RoomLayout />
-    </ThemeProvider>
+    <Routes>
+      <Route
+        path="/"
+        exact
+        element={<Navigate to={`/${uuidv4()}`} replace />}
+      />
+      <Route path="/:roomId" element={<Join />} />
+    </Routes>
   );
 }

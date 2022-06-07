@@ -18,7 +18,7 @@ import {
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import { Code, Videocam, Gesture, Chat, People } from "@mui/icons-material";
-
+import Editor from '../components/Editor'
 import { styled, useTheme } from "@mui/material/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { Menu, ChevronLeft, ChevronRight } from "@mui/icons-material";
@@ -26,7 +26,7 @@ import CodeComponent from "./Code";
 import Whiteboard from "./Whiteboard";
 import Whiteboardsocket from "./Whiteboardsocket";
 import Meet from "./Meet";
-import RoomDrawerLayout from "./RoomDrawerLayout";
+import RoomDrawerLayout from "./DrawerLayout";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -283,6 +283,7 @@ export default function RoomWorkArea() {
         <Main open={chatDrawerOpen} sx={{ flexGrow: 1 }}>
           <TabPanel value={tabValue} index={0}>
             <CodeComponent />
+            
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
             <Whiteboard />

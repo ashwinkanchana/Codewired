@@ -1,13 +1,19 @@
+import './config/config.js'
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+
 import monaco from './socket/monaco.js';
 import chat from './socket/chat.js'
 import piston from './routes/piston.js'
 import room from './routes/room.js'
+import token from './routes/token.js'
+
+
+
 
 const app = express()
 app.use(morgan('dev'))
@@ -40,12 +46,11 @@ const io = new Server(httpServer, {
 
 
 monaco(io)
-chat(io)
 
 
 app.use('/room', room)
 app.use('/code', piston)
-
+app.use('/call', token)
 
 if (process.env.NODE_ENV == "production") {
     app.use(express.static("./client/build"));
