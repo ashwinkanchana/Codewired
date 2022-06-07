@@ -64,9 +64,9 @@ const Code = () => {
         ACTIONS.JOINED,
         ({ clients, username, socketId }) => {
           // Listening for joined event
-          if (username !== RTC.uid) {
-            toast.success(`${username} joined the room.`);
-          }
+          // if (username !== RTC.uid) {
+          //   toast.info(`${username} joined the room.`);
+          // }
           setClients(clients);
           socketRef.current.emit(ACTIONS.SYNC_CODE, {
             // emit code change (sync)
@@ -79,7 +79,7 @@ const Code = () => {
 
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
         // Listening for disconnected
-        toast.success(`${username} left the room.`);
+        // toast.info(`${username} left the room.`);
         setClients((prev) => {
           // filtering clients other than left one
           return prev.filter((client) => client.socketId !== socketId);
