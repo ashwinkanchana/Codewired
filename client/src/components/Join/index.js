@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Paper, Box, Typography, Stack, TextField } from "@mui/material";
+import {
+  Paper,
+  Box,
+  Typography,
+  Stack,
+  TextField,
+  IconButton,
+  InputAdornment,
+  Tooltip,
+  OutlinedInput,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -10,7 +23,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import RoomLayout from "../RoomLayout";
 import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "../../store/actions/rtcActions";
-import { Start } from "@mui/icons-material";
+import { Start, Shuffle } from "@mui/icons-material";
+import { generateRandomName } from "randimal";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -25,7 +39,7 @@ const useClient = createClient({
 const Join = () => {
   const dispatch = useDispatch();
   const RTC = useSelector((state) => state.RTC);
-  const [username, setUsername] = useState("test");
+  const [username, setUsername] = useState("");
   const [formSubmit, setFormSubmit] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -35,6 +49,7 @@ const Join = () => {
   const { roomId } = useParams();
 
   useEffect(() => {
+    generateUsername();
     setUID(uuidv4());
   }, []);
 
@@ -49,6 +64,15 @@ const Join = () => {
       }
     }
   }, [formSubmit, username]);
+
+  const generateUsername = async () => {
+    const name = await generateRandomName();
+    setUsername(name);
+  };
+
+  const handleNameInput = (e) => {
+    setUsername(e.target.value);
+  };
 
   const handleJoin = () => {
     setFormSubmit(true);
@@ -78,14 +102,34 @@ const Join = () => {
                 What's your name?
               </Typography>
 
-              <TextField
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                error={error}
-                helperText={errorMessage}
-                id="name"
-                label="Name"
-              />
+              <FormControl variant="outlined">
+                <InputLabel htmlFor="name-join-room">Name</InputLabel>
+                <OutlinedInput
+                  value={username}
+                  onChange={handleNameInput}
+                  error={error}
+                  helperText={errorMessage}
+                  id="name"
+                  label="Name"
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <Tooltip title="Generate Username">
+                        <IconButton
+                          aria-label="generate name"
+                          onClick={generateUsername}
+                          edge="end"
+                        >
+                          <Shuffle />
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  }
+                />
+                <FormHelperText error={error} id="name-error">
+                  {errorMessage}
+                </FormHelperText>
+              </FormControl>
+
               <LoadingButton
                 onClick={handleJoin}
                 endIcon={<Start />}

@@ -1,0 +1,17 @@
+
+#videos{
+    position: relative;
+    height: 85vh;
+    width: 100%;
+    margin: auto;
+    align-self: flex-start;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    justify-items: center;
+    align-items: center;
+  }
+  
+  .vid{
+    position: relative;
+    background-color:black; 
+  }

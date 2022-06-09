@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Toolbar,
@@ -15,10 +15,12 @@ import {
   Tab,
   Grid,
 } from "@mui/material";
+import { createClient, createMicrophoneAndCameraTracks } from "agora-rtc-react";
+
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import { Code, Videocam, Gesture, Chat, People } from "@mui/icons-material";
-import Editor from '../components/Editor'
+import Editor from "../components/Editor";
 import { styled, useTheme } from "@mui/material/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { Menu, ChevronLeft, ChevronRight } from "@mui/icons-material";
@@ -117,13 +119,86 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
 
 const drawerWidth = 360;
 
+const useClient = createClient({
+  mode: "rtc",
+  codec: "vp8",
+});
+
 export default function RoomWorkArea() {
   const theme = useTheme();
+  const useMicrophoneAndCameraTracks = createMicrophoneAndCameraTracks();
 
   const [tabValue, setTabValue] = useState(0);
 
   const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const [chatDrawerTab, setChatDrawerTab] = React.useState(1);
+
+  const appId = process.env.REACT_APP_AGORA_ID;
+  const {
+    rtcToken,
+    uid,
+    roomId: channelName,
+  } = useSelector((state) => state.RTC);
+  const [users, setUsers] = useState([]);
+  const [start, setStart] = useState(false);
+  const [trackState, setTrackState] = useState({ video: false, audio: false });
+  const client = useClient();
+  const { ready, tracks } = useMicrophoneAndCameraTracks();
+
+  useEffect(() => {
+    let init = async (name) => {
+      client.on("user-published", async (user, mediaType) => {
+        await client.subscribe(user, mediaType);
+        console.log("subscribe success");
+        if (mediaType === "video") {
+          setUsers((prevUsers) => {
+            return [...prevUsers, user];
+          });
+        }
+        if (mediaType === "audio") {
+          user.audioTrack?.play();
+        }
+      });
+
+      client.on("user-unpublished", (user, type) => {
+        console.log("unpublished", user, type);
+        if (type === "audio") {
+          user.audioTrack?.stop();
+        }
+        if (type === "video") {
+          setUsers((prevUsers) => {
+            return prevUsers.filter((User) => User.uid !== user.uid);
+          });
+        }
+      });
+
+      client.on("user-left", (user) => {
+        console.log("leaving", user);
+        setUsers((prevUsers) => {
+          return prevUsers.filter((User) => User.uid !== user.uid);
+        });
+      });
+
+      client.on("user-joined", (user) => {
+        console.log("joined", user);
+        const [uid, username] = user.uid.split("~~");
+        const audio = !user._audio_muted_;
+        const video = !user._video_muted_;
+      });
+
+      await client.join(appId, name, rtcToken, uid);
+      if (tracks) await client.publish([tracks[0], tracks[1]]);
+      setStart(true);
+      (async () => {
+        await tracks[0].setEnabled(false);
+        await tracks[1].setEnabled(false);
+      })();
+    };
+
+    if (ready && tracks) {
+      init(channelName);
+    }
+  }, [channelName, client, ready, tracks]);
 
   const handleChatClickToggle = () => {
     setChatDrawerTab(0);
@@ -283,13 +358,22 @@ export default function RoomWorkArea() {
         <Main open={chatDrawerOpen} sx={{ flexGrow: 1 }}>
           <TabPanel value={tabValue} index={0}>
             <CodeComponent />
-            
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
             <Whiteboard />
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
-            <Meet />
+            <Meet
+              useClient={useClient}
+              useMicrophoneAndCameraTracks={useMicrophoneAndCameraTracks}
+              start={start}
+              tracks={tracks}
+              client={client}
+              users={users}
+              setStart={setStart}
+              trackState={trackState}
+              setTrackState={setTrackState}
+            />
           </TabPanel>
         </Main>
         <Drawer

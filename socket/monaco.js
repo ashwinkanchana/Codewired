@@ -1,4 +1,4 @@
-import ACTIONS from './actions.js'
+import ACTIONS from "./actions.js";
 const userSocketMap = {};
 
 export default (io) => {
@@ -15,6 +15,8 @@ export default (io) => {
   }
   io.on("connection", (socket) => {
     console.log("socket connected", socket.id); // browser socket id
+
+
 
     socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
       // join emitted event listen here
