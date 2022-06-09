@@ -1,55 +1,93 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Stack, Grid, Typography, CircularProgress } from "@mui/material";
+import { Button, Box, Stack, Grid, Typography, CircularProgress } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { useSelector, useDispatch } from "react-redux";
-import VideoGrid from "../MeetVideoGrid";
-import MediaControls from "../MeetControlBar";
+import { CenterLoadingSpinner } from "../RoomComponents";
+import { AgoraVideoPlayer } from "agora-rtc-react";
+import NewWindow from 'react-new-window'
+import "./index.css";
 
-const CenterLoadingSpinner = () => {
-  return (
-    <Grid
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      style={{ minHeight: "100vh" }}
-    >
-      <Grid item xs={3}>
-        <CircularProgress />
-      </Grid>
-    </Grid>
-  );
-};
-
-const Meet = ({
-  tracks,
-  client,
-  users,
-  start,
-  setStart,
-  trackState,
-  setTrackState
-}) => {
+const Meet = ({tracks}) => {
+  const [opened, setOpened] = useState(false);
+  const { start, users } = useSelector((state) => state.RTC);
   return (
     <>
-      {!(start && tracks) ? (
-        <CenterLoadingSpinner />
+    
+      {start ? (
+        <Box sx={{ display: "flex" }}>
+          <>
+            <div id="videos">
+              <AgoraVideoPlayer
+                style={{ height: "95%", width: "95%" }}
+                className="vid"
+                videoTrack={tracks[1]}
+              />
+              {users.length > 0 &&
+                users.map((user) => {
+                  if (user.videoTrack) {
+                    return (
+                      <AgoraVideoPlayer
+                        style={{ height: "95%", width: "95%" }}
+                        className="vid"
+                        videoTrack={user.videoTrack}
+                        key={user.uid}
+                      />
+                    );
+                  } else return null;
+                })}
+            </div>
+          </>
+        </Box>
       ) : (
-        <>
-          <Box sx={{ display: "flex" }}>
-            <MediaControls
-              client={client}
-              tracks={tracks}
-              setStart={setStart}
-              trackState={trackState}
-              setTrackState={setTrackState}
-            />
-            <VideoGrid users={users} tracks={tracks} />
-          </Box>
-        </>
+        <CenterLoadingSpinner />
       )}
+      {/*
+      <Button
+        onClick={() => {
+          setOpened((prev) => {
+            return !prev;
+          });
+        }}
+      >
+        {opened ? "Close" : "Open "}
+      </Button>
+      
+      {opened && (
+        <NewWindow
+          onUnload={() => this.newWindowUnloaded()}
+          features={{ left: 200, top: 200, width: 400, height: 400 }}
+        >
+          {start ? (
+        <Box sx={{ display: "flex" }}>
+          <>
+            <div id="videos">
+              <AgoraVideoPlayer
+                style={{ height: "95%", width: "95%" }}
+                className="vid"
+                videoTrack={tracks[1]}
+              />
+              {users.length > 0 &&
+                users.map((user) => {
+                  if (user.videoTrack) {
+                    return (
+                      <AgoraVideoPlayer
+                        style={{ height: "95%", width: "95%" }}
+                        className="vid"
+                        videoTrack={user.videoTrack}
+                        key={user.uid}
+                      />
+                    );
+                  } else return null;
+                })}
+            </div>
+          </>
+        </Box>
+      ) : (
+        <CenterLoadingSpinner />
+      )}
+        </NewWindow>
+      )} */}
     </>
   );
 };

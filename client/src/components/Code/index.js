@@ -121,7 +121,7 @@ const Code = () => {
 
   return (
     <>
-      <Paper sx={{ height: "94vh" }}>
+      <Paper sx={{ height: "75vh" }}>
         <Split className="split" sizes={[80, 20]}>
           <Box>
             <Editor

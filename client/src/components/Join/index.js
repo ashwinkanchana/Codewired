@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
-  Paper,
   Box,
   Typography,
   Stack,
-  TextField,
   IconButton,
   InputAdornment,
   Tooltip,
@@ -15,16 +13,21 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { createClient, createMicrophoneAndCameraTracks } from "agora-rtc-react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import RoomLayout from "../RoomLayout";
 import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "../../store/actions/rtcActions";
 import { Start, Shuffle } from "@mui/icons-material";
 import { generateRandomName } from "randimal";
+import { ToastContainer } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
+import {
+  createClient,
+  createMicrophoneAndCameraTracks,
+} from "agora-rtc-react";
+import "react-toastify/dist/ReactToastify.css";
+
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -35,22 +38,21 @@ const useClient = createClient({
   mode: "rtc",
   codec: "vp8",
 });
+const useMicrophoneAndCameraTracks = createMicrophoneAndCameraTracks();
 
 const Join = () => {
   const dispatch = useDispatch();
-  const RTC = useSelector((state) => state.RTC);
+  const { rtcToken, loading } = useSelector((state) => state.RTC);
   const [username, setUsername] = useState("");
+  const [uid, setUid] = useState("");
   const [formSubmit, setFormSubmit] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [rtcToken, setRtcToken] = useState("");
-  const [uid, setUID] = useState("");
-  const [joined, setJoined] = useState(false);
   const { roomId } = useParams();
 
   useEffect(() => {
     generateUsername();
-    setUID(uuidv4());
+    setUid(uuidv4());
   }, []);
 
   useEffect(() => {
@@ -77,13 +79,13 @@ const Join = () => {
   const handleJoin = () => {
     setFormSubmit(true);
     if (!error && username.length) {
-      dispatch(getToken(roomId, username));
+      dispatch(getToken(roomId, username, uid));
     }
   };
 
   return (
     <>
-      {!RTC?.rtcToken ? (
+      {!rtcToken.length ? (
         <>
           <Box
             sx={{
@@ -108,9 +110,9 @@ const Join = () => {
                   value={username}
                   onChange={handleNameInput}
                   error={error}
-                  helperText={errorMessage}
                   id="name"
                   label="Name"
+                  inputProps={{ maxLength: 28 }}
                   endAdornment={
                     <InputAdornment position="end">
                       <Tooltip title="Generate Username">
@@ -133,7 +135,7 @@ const Join = () => {
               <LoadingButton
                 onClick={handleJoin}
                 endIcon={<Start />}
-                loading={RTC.loading}
+                loading={loading}
                 loadingPosition="end"
                 variant="contained"
               >
@@ -146,7 +148,10 @@ const Join = () => {
       ) : (
         <>
           <ThemeProvider theme={darkTheme}>
-            <RoomLayout />
+            <RoomLayout
+              useClient={useClient}
+              useMicrophoneAndCameraTracks={useMicrophoneAndCameraTracks}
+            />
           </ThemeProvider>
         </>
       )}

@@ -1,36 +1,15 @@
-import React, { useRef } from "react";
-
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import MuiAppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box, Drawer, Tabs, Divider, IconButton, Tab } from "@mui/material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import RoomDrawerLayout from "./DrawerLayout";
 import RoomWorkArea from "./RoomWorkArea";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
+import { ADD_USER, REMOVE_USER, START_RTC } from "../store/actions/types";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { UPDATE_LANGUAGE } from "../store/actions/types";
-import { Visibility } from "@mui/icons-material";
-
-const drawerWidth = 360;
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
+const drawerWidth = 320;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
@@ -51,23 +30,6 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   })
 );
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: drawerWidth,
-  }),
-}));
-
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -77,24 +39,73 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-start",
 }));
 
-export default function PersistentDrawerRight() {
-  const IDE_state = useSelector((state) => state.IDE);
+export default function RoomLayout({
+  useClient,
+  useMicrophoneAndCameraTracks,
+}) {
   const dispatch = useDispatch();
-
-  const drawerRef = useRef(null);
-
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [value, setValue] = React.useState(1);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const {
+    appId,
+    start,
+    users,
+    rtcToken,
+    uid,
+    roomId: channelName,
+  } = useSelector((state) => state.RTC);
+  const client = useClient();
+  const { ready, tracks } = useMicrophoneAndCameraTracks();
+
+  useEffect(() => {
+    let init = async (name) => {
+      client.on("user-published", async (user, mediaType) => {
+        await client.subscribe(user, mediaType);
+        console.log("subscribe success");
+        if (mediaType === "video") {
+          dispatch({ type: ADD_USER, payload: user });
+        }
+        if (mediaType === "audio") {
+          user.audioTrack?.play();
+        }
+      });
+
+      client.on("user-unpublished", (user, type) => {
+        console.log("unpublished", user, type);
+        if (type === "audio") {
+          user.audioTrack?.stop();
+        }
+        if (type === "video") {
+          dispatch({ type: REMOVE_USER, payload: user.uid });
+        }
+      });
+
+      client.on("user-left", (user) => {
+        console.log("leaving", user);
+        dispatch({ type: REMOVE_USER, payload: user.uid });
+      });
+
+      await client.join(appId, name, rtcToken, uid);
+      if (tracks) {
+        await client.publish([tracks[0], tracks[1]]);
+        dispatch({
+          type: START_RTC,
+        });
+        await tracks[0].setEnabled(false);
+        await tracks[1].setEnabled(false);
+      }
+    };
+
+    if (ready && tracks) {
+      init(channelName);
+    }
+  }, [channelName, client, ready, tracks]);
 
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const [value, setValue] = React.useState(1);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -102,27 +113,9 @@ export default function PersistentDrawerRight() {
 
   return (
     <Box sx={{ display: "flex" }}>
-      {/* <AppBar position="fixed" open={open}>
-                <Toolbar variant="dense">
-                    <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
-                        Code
-                    </Typography>
-
-                   
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="end"
-                        onClick={handleDrawerOpen}
-                        sx={{ ...(open && { display: 'none' }) }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                </Toolbar>
-            </AppBar> */}
       <Main open={open}>
         <DrawerHeader />
-        <RoomWorkArea />
+        <RoomWorkArea tracks={tracks} />
       </Main>
       <Drawer
         style={{ visibility: open ? "visible" : "hidden" }}
@@ -139,19 +132,11 @@ export default function PersistentDrawerRight() {
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
+            {theme.direction === "rtl" ? <ChevronLeft /> : <ChevronRight />}
           </IconButton>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
-            <Tab label="Chat" {...a11yProps(0)} />
-            <Tab label="Users" {...a11yProps(1)} />
+          <Tabs value={value} onChange={handleChange} aria-label="drawer tabs">
+            <Tab label="Chat" />
+            <Tab label="Users" />
           </Tabs>
         </DrawerHeader>
         <Divider />
