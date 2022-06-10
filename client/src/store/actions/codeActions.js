@@ -3,8 +3,8 @@ import { toast } from "react-toastify";
 import {
   REQUEST_EXECUTION,
   UPDATE_RUN,
-  GET_LANGUAGES_LIST,
-  LANGUAGES_LIST_LOADING,
+  FETCH_CODE_HISTORY,
+  CODE_HISTORY_LOADING,
 } from "./types";
 
 export const executeCode = (code, language, stdin) => async (dispatch) => {
@@ -31,20 +31,23 @@ export const executeCode = (code, language, stdin) => async (dispatch) => {
   }
 };
 
-export const loadLanguages = () => async (dispatch) => {
-  console.log("loadLanguages");
+export const fetchCodeHistory = (roomId) => async (dispatch) => {
+  console.log("fetchCodeHistory");
   dispatch({
-    type: LANGUAGES_LIST_LOADING,
+    type: CODE_HISTORY_LOADING,
   });
   try {
-    const { data } = await axios.get("/code/runtimes");
-    console.log("loadLanguages", data);
+    const { data } = await axios.get(`/code/history/${roomId}`);
+    console.log("fetchCodeHistory", data);
     await dispatch({
-      type: GET_LANGUAGES_LIST,
-      payload: data,
+      type: FETCH_CODE_HISTORY,
+      payload: {
+        language: data.language,
+        code: data.code,
+      },
     });
   } catch (error) {
-    console.log("loadLanguages error", error);
+    console.log("fetchCodeHistory error", error);
     toast.error(error.message, {
       position: toast.POSITION.BOTTOM_LEFT,
     });

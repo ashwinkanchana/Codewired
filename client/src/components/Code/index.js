@@ -28,84 +28,18 @@ import {
 
 import "./style.css";
 
-const Code = () => {
+const Code = ({ socketRef}) => {
   const IDE = useSelector((state) => state.IDE);
-  const RTC = useSelector((state) => state.RTC);
   const dispatch = useDispatch();
 
-  const socketRef = useRef(null);
-  const codeRef = useRef(null);
-  const location = useLocation();
-  const { roomId } = useParams();
-  const navigate = useNavigate();
-  const [clients, setClients] = useState([]);
-
-  useEffect(() => {
-    codeRef.current = IDE.code;
-    const init = async () => {
-      function handleErrors(e) {
-        console.log("socket error", e);
-        toast.error("Socket connection failed, try again later.");
-        navigate("/");
-      }
-
-      socketRef.current = await initSocket();
-      socketRef.current.on("connect_error", (err) => handleErrors(err));
-      socketRef.current.on("connect_failed", (err) => handleErrors(err));
-
-      // message send to server, event emit
-      socketRef.current.emit(ACTIONS.JOIN, {
-        // join event
-        roomId, // useParams - link param
-        username: RTC.uid,
-      });
-
-      socketRef.current.on(
-        ACTIONS.JOINED,
-        ({ clients, username, socketId }) => {
-          // Listening for joined event
-          // if (username !== RTC.uid) {
-          //   toast.info(`${username} joined the room.`);
-          // }
-          setClients(clients);
-          socketRef.current.emit(ACTIONS.SYNC_CODE, {
-            // emit code change (sync)
-            code: codeRef.current,
-            //code: IDE.code,
-            socketId,
-          });
-        }
-      );
-
-      socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
-        // Listening for disconnected
-        // toast.info(`${username} left the room.`);
-        setClients((prev) => {
-          // filtering clients other than left one
-          return prev.filter((client) => client.socketId !== socketId);
-        });
-      });
-    };
-    init();
-
-    return () => {
-      // clear listeners
-      socketRef.current.disconnect();
-      socketRef.current.off(ACTIONS.JOINED);
-      socketRef.current.off(ACTIONS.DISCONNECTED);
-    };
-  }, []);
-
-  const handleCodeChange = (code) => {
-    dispatch({ type: UPDATE_CODE, payload: code });
-  };
+  
 
   const handleLanguageChange = (event) => {
     dispatch({ type: UPDATE_LANGUAGE, payload: event.target.value });
   };
 
   const handleStdInChange = (event) => {
-    const input = event.target.value
+    const input = event.target.value;
     dispatch({ type: UPDATE_STDIN, payload: input });
   };
 
@@ -116,28 +50,29 @@ const Code = () => {
   const textAreaStyle = {
     color: "white",
     width: "100%",
-    background: "#1e1e1e",
+    background: "#0000002e",
+    border: "none",
+    borderRadius: "4px",
+    boxShadow: "none",
+    outline: "none",
+    padding: "10px",
   };
 
   return (
     <>
-      <Paper sx={{ height: "88vh" }}>
-        <Split className="split" sizes={[80, 20]}>
+      <Paper sx={{ height: "100%", overflow: "hidden" }}>
+        <Split className="split" sizes={[70, 30]}>
           <Box>
             <Editor
               socketRef={socketRef}
-              roomId={roomId}
-              onCodeChange={(code) => {
-                codeRef.current = code;
-                dispatch({ type: UPDATE_CODE, payload: code });
-              }}
             />
           </Box>
 
-          <Stack>
+          <Stack sx={{ p: 2 }} spacing={2}>
             <FormControl variant="standard">
               <InputLabel id="lang-select-label">Language</InputLabel>
               <Select
+                variant="filled"
                 labelId="lang-select-label"
                 id="lang-select"
                 value={IDE.language}
@@ -154,30 +89,41 @@ const Code = () => {
               </Select>
             </FormControl>
 
-            <Typography variant="overline" display="block" gutterBottom>
-              Input
-            </Typography>
-            <TextareaAutosize
-              style={textAreaStyle}
-              minRows={13}
-              maxRows={15}
-              value={IDE.stdin}
-              onChange={(e) => handleStdInChange(e)}
-            />
-            <Typography variant="overline" display="block" gutterBottom>
-              Output
-            </Typography>
-            <TextareaAutosize
-              style={textAreaStyle}
-              readOnly
-              minRows={13}
-              maxRows={15}
-              value={
-                IDE.run.stderr +
-                (IDE.run.signal ? IDE.run.signal : "") +
-                IDE.run.stdout
-              }
-            />
+            <FormControl variant="standard">
+              <Typography variant="overline" display="block" gutterBottom>
+                Input
+              </Typography>
+              <TextareaAutosize
+                data-gramm="false"
+                style={textAreaStyle}
+                minRows={13}
+                maxRows={15}
+                value={IDE.stdin}
+                onChange={(e) => handleStdInChange(e)}
+              />
+            </FormControl>
+            <FormControl variant="standard">
+              <Typography variant="overline" display="block" gutterBottom>
+                Output
+              </Typography>
+              <TextareaAutosize
+                onClick={() => {
+                  toast.info("Output is read only", {
+                    position: toast.POSITION.BOTTOM_RIGHT,
+                    autoClose: 1000,
+                  });
+                }}
+                style={textAreaStyle}
+                readOnly
+                minRows={13}
+                maxRows={15}
+                value={
+                  IDE.run.stderr +
+                  (IDE.run.signal ? IDE.run.signal : "") +
+                  IDE.run.stdout
+                }
+              />
+            </FormControl>
           </Stack>
         </Split>
 
@@ -190,6 +136,7 @@ const Code = () => {
             bottom: 20,
             left: "auto",
             position: "fixed",
+            zIndex: 12,
           }}
           onClick={() => {
             handleCodeExecutionRequest();

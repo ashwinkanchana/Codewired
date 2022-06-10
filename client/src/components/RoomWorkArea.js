@@ -26,17 +26,21 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import CodeComponent from "./Code";
 import Whiteboard from "./Whiteboard";
 import Meet from "./Meet";
-import RoomDrawerLayout from "./DrawerLayout";
+import Chat from "./Chat";
+import Users from "./Users";
 
-
-export default function RoomWorkArea({ tracks }) {
+const RoomWorkArea = ({
+  socketRef,
+  tracks,
+  tabValue,
+  setTabValue,
+  chatDrawerOpen,
+  setChatDrawerOpen,
+  chatDrawerTab,
+  setChatDrawerTab,
+  sendMessage,
+}) => {
   const theme = useTheme();
-  const { start, users } = useSelector((state) => state.RTC);
-  const [tabValue, setTabValue] = useState(0);
-  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
-  const [chatDrawerTab, setChatDrawerTab] = React.useState(1);
-
-  
 
   const handleChatDrawerTabChange = (event, newValue) => {
     setChatDrawerTab(newValue);
@@ -56,7 +60,7 @@ export default function RoomWorkArea({ tracks }) {
         />
         <Main open={chatDrawerOpen} sx={{ flexGrow: 1 }}>
           <TabPanel value={tabValue} index={0}>
-            <CodeComponent />
+            <CodeComponent socketRef={socketRef} />
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
             <Whiteboard />
@@ -89,15 +93,21 @@ export default function RoomWorkArea({ tracks }) {
             >
               <Tab label="Chat" />
               <Tab label="Users" />
-              
             </Tabs>
           </ChatDrawerHeader>
           <Divider />
-          <RoomDrawerLayout value={chatDrawerTab} />
+          <>
+            <TabPanel value={chatDrawerTab} index={0}>
+              <Chat sendMessage={sendMessage} />
+            </TabPanel>
+            <TabPanel value={chatDrawerTab} index={1}>
+              <Users />
+            </TabPanel>
+          </>
         </Drawer>
       </Box>
-     
-      
     </Paper>
   );
-}
+};
+
+export default RoomWorkArea;

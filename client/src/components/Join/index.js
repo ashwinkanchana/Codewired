@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
+  CssBaseline,
+  Paper,
   Typography,
   Stack,
   IconButton,
@@ -21,12 +23,8 @@ import { Start, Shuffle } from "@mui/icons-material";
 import { generateRandomName } from "randimal";
 import { ToastContainer } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
-import {
-  createClient,
-  createMicrophoneAndCameraTracks,
-} from "agora-rtc-react";
+import { createClient, createMicrophoneAndCameraTracks } from "agora-rtc-react";
 import "react-toastify/dist/ReactToastify.css";
-
 
 const darkTheme = createTheme({
   palette: {
@@ -84,78 +82,79 @@ const Join = () => {
   };
 
   return (
-    <>
-      {!rtcToken.length ? (
-        <>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
-              boxShadow: 24,
-              minWidth: "40%",
-              p: 3,
-            }}
-          >
-            <Stack spacing={2} justifyItems="center">
-              <Typography variant="overline" component="h2">
-                What's your name?
-              </Typography>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <>
+        {!rtcToken.length ? (
+          <>
+            <Paper
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                boxShadow: 24,
+                minWidth: "40%",
+                p: 3,
+              }}
+            >
+              <Stack spacing={2} justifyItems="center">
+                <Typography variant="overline" component="h2">
+                  What's your name?
+                </Typography>
 
-              <FormControl variant="outlined">
-                <InputLabel htmlFor="name-join-room">Name</InputLabel>
-                <OutlinedInput
-                  value={username}
-                  onChange={handleNameInput}
-                  error={error}
-                  id="name"
-                  label="Name"
-                  inputProps={{ maxLength: 28 }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <Tooltip title="Generate Username">
-                        <IconButton
-                          aria-label="generate name"
-                          onClick={generateUsername}
-                          edge="end"
-                        >
-                          <Shuffle />
-                        </IconButton>
-                      </Tooltip>
-                    </InputAdornment>
-                  }
-                />
-                <FormHelperText error={error} id="name-error">
-                  {errorMessage}
-                </FormHelperText>
-              </FormControl>
+                <FormControl variant="outlined">
+                  <InputLabel htmlFor="name-join-room">Name</InputLabel>
+                  <OutlinedInput
+                    value={username}
+                    onChange={handleNameInput}
+                    error={error}
+                    id="name"
+                    label="Name"
+                    inputProps={{ maxLength: 28 }}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <Tooltip title="Generate Username">
+                          <IconButton
+                            aria-label="generate name"
+                            onClick={generateUsername}
+                            edge="end"
+                          >
+                            <Shuffle />
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>
+                    }
+                  />
+                  <FormHelperText error={error} id="name-error">
+                    {errorMessage}
+                  </FormHelperText>
+                </FormControl>
 
-              <LoadingButton
-                onClick={handleJoin}
-                endIcon={<Start />}
-                loading={loading}
-                loadingPosition="end"
-                variant="contained"
-              >
-                Join
-              </LoadingButton>
-            </Stack>
-          </Box>
-          <ToastContainer />
-        </>
-      ) : (
-        <>
-          <ThemeProvider theme={darkTheme}>
+                <LoadingButton
+                  onClick={handleJoin}
+                  endIcon={<Start />}
+                  loading={loading}
+                  loadingPosition="end"
+                  variant="contained"
+                >
+                  Join
+                </LoadingButton>
+              </Stack>
+            </Paper>
+
+            <ToastContainer theme='dark'/>
+          </>
+        ) : (
+          <>
             <RoomLayout
               useClient={useClient}
               useMicrophoneAndCameraTracks={useMicrophoneAndCameraTracks}
             />
-          </ThemeProvider>
-        </>
-      )}
-    </>
+          </>
+        )}
+      </>
+    </ThemeProvider>
   );
 };
 

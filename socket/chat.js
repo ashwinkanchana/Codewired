@@ -9,8 +9,6 @@ const chat = (io) => {
           room: room,
         });
 
-        console.log(response);
-
         if (error) {
           callback(error);
           return;

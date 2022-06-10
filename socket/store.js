@@ -20,9 +20,7 @@ const addUser = ({ id, user, room }) => {
     const response = { id, user, room }
 
     users.push(response)
-
-    console.log(users)
-
+    console.log('users', users)
     return { response };
 }
 

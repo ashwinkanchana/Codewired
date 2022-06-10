@@ -5,20 +5,20 @@ import {
   UPDATE_STDIN,
   UPDATE_RUN,
   REQUEST_EXECUTION,
-  GET_LANGUAGES_LIST,
-  LANGUAGES_LIST_LOADING,
+  CODE_REMOVE_CLIENT,
+  CODE_SET_CLIENTS,
+  CODE_HISTORY_LOADING,
+  FETCH_CODE_HISTORY
 } from "../actions/types";
 
 const initState = {
   languages_loading: false,
   languages: [],
   language: "python",
-  code: `for i in range(0, 5):
-    for j in range(0, i+1):
-        print("* ",end="")
-    print("\\r")`,
+  code: ``,
   stdin: "test",
   is_executing: false,
+  clients: [],
   run: {
     stdout: "",
     stderr: "",
@@ -40,17 +40,6 @@ const codeReducer = (state = initState, action) => {
         ...state,
         language: action.payload,
       };
-    case LANGUAGES_LIST_LOADING:
-      return {
-        ...state,
-        languages_loading: true,
-      };
-    case GET_LANGUAGES_LIST:
-      return {
-        ...state,
-        languages: action.payload,
-        languages_loading: false,
-      };
     case UPDATE_STDIN:
       return {
         ...state,
@@ -67,6 +56,30 @@ const codeReducer = (state = initState, action) => {
         ...state,
         is_executing: true,
       };
+    case CODE_SET_CLIENTS:
+      return {
+        ...state,
+        clients: action.payload,
+      };
+    case CODE_REMOVE_CLIENT:
+      return {
+        ...state,
+        clients: state.clients.filter(
+          (client) => client.socketId !== action.payload
+        ),
+      };
+      case CODE_HISTORY_LOADING:
+        return {
+          ...state,
+          history_loading: true,
+        };
+      case FETCH_CODE_HISTORY:
+        return {
+          ...state,
+          history_loading: false,
+          code: action.payload.code,
+          language: action.payload.language,
+        };
     default:
       return state;
   }

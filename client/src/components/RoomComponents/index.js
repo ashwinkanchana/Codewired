@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -20,8 +20,8 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import MuiAppBar from '@mui/material/AppBar';
-import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar from "@mui/material/AppBar";
+import MuiDrawer from "@mui/material/Drawer";
 import {
   Code,
   Videocam,
@@ -33,6 +33,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { TOGGLE_CAMERA, TOGGLE_MIC } from "../../store/actions/types";
 import "./index.css";
+import codeLogo from "../../assets/vscode.png";
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
 
@@ -80,7 +81,7 @@ const ChatDrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0),
   // // necessary for content to be below app bar
   // ...theme.mixins.toolbar,
-  zIndex: theme.zIndex.toolbar + 1,
+  zIndex: theme.zIndex.Toolbar + 1,
   justifyContent: "flex-start",
 }));
 
@@ -143,7 +144,20 @@ const CodeAppBar = () => {
   return (
     <AppBar position="fixed" open={false}>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+      <img
+            width={32}
+            style={{marginRight: '8px'}}
+            class="logo-container"
+            src={codeLogo}
+            alt="Logo"
+          />
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ display: { xs: "none", sm: "block" } }}
+        >
+          
           Code
         </Typography>
       </Toolbar>
@@ -161,9 +175,6 @@ const LeftDrawer = ({
 }) => {
   const dispatch = useDispatch();
   const { trackState } = useSelector((state) => state.RTC);
-
-
-  
 
   const handleChatClickToggle = () => {
     if (chatDrawerOpen) {
@@ -350,11 +361,8 @@ const LeftDrawer = ({
               name="video"
             />
           </Stack>
-          
         </ListItem>
-        
       </List>
-      
     </MiniDrawer>
   );
 };
