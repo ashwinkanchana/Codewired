@@ -7,7 +7,7 @@ import morgan from "morgan";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-import monaco from "./socket/monaco.js";
+import code from "./socket/code.js";
 import chat from "./socket/chat.js";
 import piston from "./routes/piston.js";
 import room from "./routes/room.js";
@@ -42,7 +42,8 @@ const io = new Server(httpServer, {
 
 //const io = new Server(httpServer);
 
-monaco(io);
+code(io);
+chat(io);
 
 app.use("/room", room);
 app.use("/code", piston);

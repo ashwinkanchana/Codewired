@@ -3,6 +3,6 @@
 } */
 
 .CodeMirror {
-  min-height: calc(75vh - 20px);
+  min-height: calc(90vh - 20px);
   font-size: 16px;
 }

@@ -1,40 +1,54 @@
-import { addUser, removeUser, getUser, getUsersInRoom } from './usersAndRooms.js';
-
-export default (io) => {
-
-    io.on('connection', (socket) => {
-        socket.on('join', ({ name, room }, callback) => {
-            const { error, user } = addUser({ id: socket.id, name, room });
-
-            if (error) return callback(error);
-
-            socket.join(user.room);
-
-            socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${user.room}.` });
-            socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
-
-            io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
-
-            callback();
+import { addUser, removeUser, getRoomUsers, getUser } from "./store.js";
+const chat = (io) => {
+  io.on("connect", (socket) => {
+    socket.on("join", ({ user, room }, callback) => {
+      if (user && room) {
+        const { response, error } = addUser({
+          id: socket.id,
+          user: user,
+          room: room,
         });
 
+        console.log(response);
 
-        socket.on('sendMessage', (message, callback) => {
-            const user = getUser(socket.id);
-
-            io.to(user.room).emit('message', { user: user.name, text: message });
-
-            callback();
+        if (error) {
+          callback(error);
+          return;
+        }
+        socket.join(response.room);
+        socket.emit("message", {
+          user: "admin",
+          text: `Welcome ${response.user} `,
+        });
+        socket.broadcast.to(response.room).emit("message", {
+          user: "admin",
+          text: `${response.user} has joined`,
         });
 
-
-        socket.on('disconnect', () => {
-            const user = removeUser(socket.id);
-
-            if (user) {
-                io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
-                io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
-            }
-        })
+        io.to(response.room).emit("roomMembers", getRoomUsers(response.room));
+      }
     });
-}
+
+    socket.on("sendMessage", (message, callback) => {
+      const user = getUser(socket.id);
+
+      io.to(user.room).emit("message", { user: user.user, text: message });
+
+      callback();
+    });
+
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+      const user = removeUser(socket.id);
+
+      if (user) {
+        io.to(user.room).emit("message", {
+          user: "admin",
+          text: `${user.user} has left`,
+        });
+      }
+    });
+  });
+};
+
+export default chat;
