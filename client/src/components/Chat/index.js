@@ -24,11 +24,7 @@ function Chat({ sendMessage }) {
                   return (
                     <div
                       className="message"
-                      id={
-                        username?.toLowerCase() === messageContent.user
-                          ? "other"
-                          : "you"
-                      }
+                      id={username === messageContent.user ? "other" : "you"}
                     >
                       <div>
                         <div className="message-content">

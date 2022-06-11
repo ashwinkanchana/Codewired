@@ -9,38 +9,33 @@ import TextareaAutosize from "@mui/material/TextareaAutosize";
 import { Fab, Paper, Grid } from "@mui/material";
 import { PlayArrow, Cached } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
-import Monaco from "../Monaco";
 import { toast, ToastContainer } from "react-toastify";
-import {
-  UPDATE_CODE,
-  UPDATE_STDIN,
-  UPDATE_LANGUAGE,
-} from "../../store/actions/types";
+import { UPDATE_STDIN, UPDATE_LANGUAGE } from "../../store/actions/types";
 import { executeCode } from "../../store/actions/codeActions";
-
 import { Box, InputLabel, MenuItem, FormControl, Select } from "@mui/material";
-import {
-  useLocation,
-  useNavigate,
-  Navigate,
-  useParams,
-} from "react-router-dom";
-
 import "./style.css";
 
-const Code = ({ socketRef}) => {
+const Code = ({ socketRef }) => {
   const IDE = useSelector((state) => state.IDE);
+  const { roomId } = useSelector((state) => state.RTC);
   const dispatch = useDispatch();
 
-  
-
   const handleLanguageChange = (event) => {
-    dispatch({ type: UPDATE_LANGUAGE, payload: event.target.value });
+    const language = event.target.value;
+    dispatch({ type: UPDATE_LANGUAGE, payload: language });
+    socketRef.current.emit(ACTIONS.LANGUAGE_CHANGE, {
+      roomId,
+      language,
+    });
   };
 
   const handleStdInChange = (event) => {
     const input = event.target.value;
     dispatch({ type: UPDATE_STDIN, payload: input });
+    socketRef.current.emit(ACTIONS.INPUT_CHANGE, {
+      roomId,
+      input,
+    });
   };
 
   const handleCodeExecutionRequest = (e) => {
@@ -63,9 +58,7 @@ const Code = ({ socketRef}) => {
       <Paper sx={{ height: "100%", overflow: "hidden" }}>
         <Split className="split" sizes={[70, 30]}>
           <Box>
-            <Editor
-              socketRef={socketRef}
-            />
+            <Editor socketRef={socketRef} />
           </Box>
 
           <Stack sx={{ p: 2 }} spacing={2}>

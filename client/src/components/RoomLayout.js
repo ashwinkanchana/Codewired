@@ -24,7 +24,6 @@ import {
   UPDATE_ROOM_USERS,
 } from "../store/actions/types";
 import { initSocket } from "../utils/socketio-client";
-import { TabPanel } from "./RoomComponents";
 import { ToastContainer, toast } from "react-toastify";
 import ACTIONS from "../utils/actions";
 import "react-toastify/dist/ReactToastify.css";
@@ -146,20 +145,18 @@ export default function RoomLayout({
       socketRef.current.on("connect_error", (err) => handleErrors(err));
       socketRef.current.on("connect_failed", (err) => handleErrors(err));
 
-      socketRef.current.on("message", (message) => {
+      socketRef.current.on(ACTIONS.RECEIVE_MESSAGE, (message) => {
         dispatch({
           type: ADD_NEW_MESSAGE,
           payload: message,
         });
-        console.log("new message", message);
       });
 
-      socketRef.current.on("roomMembers", (usersList) => {
+      socketRef.current.on(ACTIONS.ROOM_MEMBERS, (usersList) => {
         dispatch({
           type: UPDATE_ROOM_USERS,
           payload: usersList,
         });
-        console.log("roomMembers", usersList);
       });
 
       socketRef.current.emit(
@@ -192,16 +189,6 @@ export default function RoomLayout({
             type: CODE_SET_CLIENTS,
             payload: clients,
           });
-
-          socketRef.current.emit(ACTIONS.SYNC_CODE, {
-            // emit code change (sync)
-
-            //#######################################
-            //code: codeRef.current,
-            //#######################################
-            code: IDE.code,
-            socketId,
-          });
         }
       );
 
@@ -226,7 +213,7 @@ export default function RoomLayout({
     e.preventDefault();
 
     if (message.length !== 0)
-      socketRef.current.emit("sendMessage", message, () => {
+      socketRef.current.emit(ACTIONS.SEND_MESSAGE, message, () => {
         dispatch({
           type: COMPOSE_MESSAGE,
           payload: "",

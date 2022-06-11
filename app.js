@@ -12,7 +12,7 @@ import chat from "./socket/chat.js";
 import piston from "./routes/piston.js";
 import room from "./routes/room.js";
 import token from "./routes/token.js";
-
+import './config/mongo.js'
 const app = express();
 app.use(morgan("dev"));
 // const corsOptions = {

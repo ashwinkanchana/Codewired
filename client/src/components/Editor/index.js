@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { UPDATE_CODE } from "../../store/actions/types";
-// import Codemirror from "codemirror";
+import ACTIONS from "../../utils/actions";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/dracula.css";
@@ -17,49 +17,14 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import "codemirror/keymap/sublime";
 import "codemirror/addon/runmode/runmode";
-import ACTIONS from "../../utils/actions";
+
 import "./index.css";
 
 const Editor = ({ socketRef }) => {
   const IDE = useSelector((state) => state.IDE);
   const { roomId } = useSelector((state) => state.RTC);
-
   const dispatch = useDispatch();
-  const editorRef = useRef(null);
-  // useEffect(() => {
-  //   async function init() {
-  //     editorRef.current = Codemirror.fromTextArea(
-  //       document.getElementById("realtimeEditor"),
-  //       {
-  //         mode: { name: `clike`, json: true },
-  //         theme: "dracula",
-  //         showHint: true,
-  //         autoCloseTags: true,
-  //         autoCloseBrackets: true,
-  //         lineNumbers: true,
-  //         lineWrapping: true,
-  //       }
-  //     );
-
-  //     editorRef.current.on("change", (instance, changes) => {
-  //       const { origin } = changes; // origin also provides informations like copy, cut, paste, etc
-  //       const code = instance.getValue();
-  //       dispatch({ type: UPDATE_CODE, payload: code });
-  //       if (origin !== "setValue") {
-  //         socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-  //           roomId,
-  //           code,
-  //         });
-  //       }
-  //     });
-  //   }
-  //   init();
-  // }, []);
-
-  // useEffect(() => {
-  //   editorRef.current.mode.name = getThemeForLanguage();
-  // }, [IDE.language]);
-
+ 
   const getThemeForLanguage = () => {
     switch (IDE.language) {
       case "cpp":

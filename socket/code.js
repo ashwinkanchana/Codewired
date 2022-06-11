@@ -1,4 +1,5 @@
 import ACTIONS from "./actions.js";
+import { updateCode, updateRoomLanguage } from "../controllers/database.js";
 const userSocketMap = {};
 
 export default (io) => {
@@ -33,12 +34,15 @@ export default (io) => {
       });
     });
 
-    socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+    socket.on(ACTIONS.CODE_CHANGE, async ({ roomId, code }) => {
+      await updateCode(roomId, code)
       socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
     });
 
-    socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
-      io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+
+    socket.on(ACTIONS.LANGUAGE_CHANGE, async ({ roomId, language }) => {
+      await updateRoomLanguage(roomId, language)
+      socket.in(roomId).emit(ACTIONS.LANGUAGE_CHANGE, { language });
     });
 
     socket.on("disconnecting", () => {

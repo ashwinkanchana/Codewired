@@ -1,5 +1,6 @@
 import express from "express";
 import agora from "agora-access-token";
+import {getRoomOrCreate} from '../controllers/database.js'
 const { RtcTokenBuilder, RtcRole } = agora;
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const nocache = (_, resp, next) => {
   next();
 };
 
-const generateRTCToken = (req, resp) => {
+const generateRTCToken = async (req, resp) => {
   // set response header
   resp.header("Access-Control-Allow-Origin", "*");
   // get channel name
@@ -71,8 +72,11 @@ const generateRTCToken = (req, resp) => {
   } else {
     return resp.status(500).json({ error: "token type is invalid" });
   }
+
+  
   // return the token
-  return resp.json({ rtcToken: token });
+  const roomData = await getRoomOrCreate(channelName);
+  return resp.json({ rtcToken: token , roomData});
 };
 
 router.get("/rtc/:channel/:role/:tokentype/:uid", nocache, generateRTCToken);
