@@ -21,6 +21,11 @@ const RoomSchema = new mongoose.Schema(
       lowercase: true,
       default: 'c++'
     },
+    stdin: {
+      type: String,
+      trim: true,
+      default: 'Hello'
+    },
     chat: {
       type: [Chat.schema],
     },

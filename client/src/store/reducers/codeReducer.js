@@ -16,7 +16,7 @@ const initState = {
   languages: [],
   language: "python",
   code: ``,
-  stdin: "test",
+  stdin: ``,
   is_executing: false,
   clients: [],
   run: {

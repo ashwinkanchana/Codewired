@@ -18,6 +18,7 @@ import {
   Stack,
   Switch,
   Button,
+  Badge,
   CircularProgress,
 } from "@mui/material";
 import MuiAppBar from "@mui/material/AppBar";
@@ -144,20 +145,19 @@ const CodeAppBar = () => {
   return (
     <AppBar position="fixed" open={false}>
       <Toolbar>
-      <img
-            width={32}
-            style={{marginRight: '8px'}}
-            class="logo-container"
-            src={codeLogo}
-            alt="Logo"
-          />
+        <img
+          width={32}
+          style={{ marginRight: "8px" }}
+          class="logo-container"
+          src={codeLogo}
+          alt="Logo"
+        />
         <Typography
           variant="h6"
           noWrap
           component="div"
           sx={{ display: { xs: "none", sm: "block" } }}
         >
-          
           Code
         </Typography>
       </Toolbar>
@@ -175,6 +175,7 @@ const LeftDrawer = ({
 }) => {
   const dispatch = useDispatch();
   const { trackState } = useSelector((state) => state.RTC);
+  const { users } = useSelector((state) => state.CHAT);
 
   const handleChatClickToggle = () => {
     if (chatDrawerOpen) {
@@ -327,41 +328,51 @@ const LeftDrawer = ({
                 justifyContent: "center",
               }}
             >
-              <People />
+              <Badge badgeContent={users.length} color="primary">
+                <People />
+              </Badge>
             </ListItemIcon>
           </ListItemButton>
         </ListItem>
 
-        <ListItem disablePadding sx={{ bottom: 0, position: "fixed" }}>
-          <Stack
-            direction="column"
-            spacing={0}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Mic />
-            <Switch
-              checked={trackState.audio}
-              onChange={() => mute("audio")}
-              name="audio"
-            />
-          </Stack>
-        </ListItem>
-        <ListItem disablePadding sx={{ bottom: 72, position: "fixed" }}>
-          <Stack
-            direction="column"
-            spacing={0}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Videocam />
-            <Switch
-              checked={trackState.video}
-              onChange={() => mute("video")}
-              name="video"
-            />
-          </Stack>
-        </ListItem>
+        {/* <ListItem
+          disablePadding
+          
+        > */}
+        <Stack
+          sx={{ bottom: 0, position: "fixed", overflow: "hidden" }}
+          direction="column"
+          spacing={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Mic />
+          <Switch
+            checked={trackState.audio}
+            onChange={() => mute("audio")}
+            name="audio"
+          />
+        </Stack>
+        {/* </ListItem> */}
+        {/* <ListItem
+          disablePadding
+          sx={{ bottom: 72, position: "fixed", overflow: "hidden" }}
+        > */}
+        <Stack
+          sx={{ bottom: 72, position: "fixed", overflow: "hidden" }}
+          direction="column"
+          spacing={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Videocam />
+          <Switch
+            checked={trackState.video}
+            onChange={() => mute("video")}
+            name="video"
+          />
+        </Stack>
+        {/* </ListItem> */}
       </List>
     </MiniDrawer>
   );

@@ -1,5 +1,5 @@
 import ACTIONS from "./actions.js";
-import { updateCode, updateRoomLanguage } from "../controllers/database.js";
+import { updateCode, updateRoomInput, updateRoomLanguage } from "../controllers/database.js";
 const userSocketMap = {};
 
 export default (io) => {
@@ -42,7 +42,17 @@ export default (io) => {
 
     socket.on(ACTIONS.LANGUAGE_CHANGE, async ({ roomId, language }) => {
       await updateRoomLanguage(roomId, language)
-      socket.in(roomId).emit(ACTIONS.LANGUAGE_CHANGE, { language });
+      socket.in(roomId).emit(ACTIONS.UPDATE_LANGUAGE, { language });
+    });
+
+    socket.on(ACTIONS.INPUT_CHANGE, async ({ roomId, input }) => {
+      await updateRoomInput(roomId, input)
+      socket.in(roomId).emit(ACTIONS.UPDATE_INPUT, { input });
+    });
+
+    socket.on(ACTIONS.INPUT_CHANGE, async ({ roomId, input }) => {
+      await updateRoomInput(roomId, input)
+      socket.in(roomId).emit(ACTIONS.UPDATE_INPUT, { input });
     });
 
     socket.on("disconnecting", () => {

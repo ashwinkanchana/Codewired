@@ -24,8 +24,7 @@ const chat = (io) => {
           text: `Welcome ${response.user} `,
         });
         let text2 = `${response.user} has joined`;
-        if(user)
-          addNewChatMessage(user.room, text2, "Admin");
+        if (user) addNewChatMessage(user.room, text2, "Admin");
         socket.broadcast.to(response.room).emit(actions.RECEIVE_MESSAGE, {
           user: "Admin",
           text: text2,

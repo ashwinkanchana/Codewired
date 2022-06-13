@@ -22,10 +22,12 @@ import {
   START_RTC,
   UPDATE_CODE,
   UPDATE_ROOM_USERS,
+  UPDATE_LANGUAGE,
+  UPDATE_STDIN,
 } from "../store/actions/types";
 import { initSocket } from "../utils/socketio-client";
 import { ToastContainer, toast } from "react-toastify";
-import ACTIONS from "../utils/actions";
+import ACTIONS, { UPDATE_INPUT } from "../utils/actions";
 import "react-toastify/dist/ReactToastify.css";
 
 const drawerWidth = 320;
@@ -180,6 +182,18 @@ export default function RoomLayout({
           //editorRef.current.setValue(code);
           dispatch({ type: UPDATE_CODE, payload: code });
         }
+      });
+
+      socketRef.current.on(ACTIONS.UPDATE_LANGUAGE, ({ language }) => {
+        dispatch({ type: UPDATE_LANGUAGE, payload: language });
+        toast.info(`Language changed to ${language}`, {
+          position: toast.POSITION.BOTTOM_RIGHT,
+          autoClose: 3000,
+        });
+      });
+
+      socketRef.current.on(ACTIONS.UPDATE_INPUT, ({ input }) => {
+        dispatch({ type: UPDATE_STDIN, payload: input });
       });
 
       socketRef.current.on(

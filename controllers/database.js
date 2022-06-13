@@ -29,13 +29,32 @@ const updateRoomLanguage = async (roomId, language) => {
   }
 };
 
+const updateRoomInput = async (roomId, stdin) => {
+  try {
+    const query = { roomId };
+    const update = { stdin };
+    const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+    const { data } = await Room.findOneAndUpdate(query, update, options);
+    return data;
+  } catch (error) {
+    console.log("updateRoomInput error", error);
+    return false;
+  }
+};
+
+
+
+
+
 //add new chat
 const addNewChatMessage = async (roomId, text, user) => {
   try {
     let room = await Room.findOne({ roomId });
-    room.chat.push({ text, user });
-    const res = await room.save();
-    console.log("addNewChatMessage res", res);
+    if (room && room.chat) {
+      room.chat.push({ text, user });
+      const res = await room.save();
+      console.log("addNewChatMessage res", res);
+    }
     return true;
   } catch (error) {
     console.log("addNewChatMessage error", error);
@@ -75,6 +94,7 @@ const getRoomOrCreate = async (roomId) => {
 export {
   updateCode,
   updateRoomLanguage,
+  updateRoomInput,
   addNewChatMessage,
   getChatHistory,
   getRoomOrCreate,
