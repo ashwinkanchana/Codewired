@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 
 import code from "./socket/code.js";
 import chat from "./socket/chat.js";
+import scribble from "./socket/scribble.js";
 import piston from "./routes/piston.js";
 import room from "./routes/room.js";
 import token from "./routes/token.js";
@@ -44,6 +45,7 @@ const io = new Server(httpServer, {
 
 code(io);
 chat(io);
+scribble(io);
 
 app.use("/room", room);
 app.use("/code", piston);

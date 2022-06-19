@@ -31,6 +31,9 @@ import Users from "./Users";
 
 const RoomWorkArea = ({
   socketRef,
+  canvasRef,
+  paths,
+  setPaths,
   tracks,
   tabValue,
   setTabValue,
@@ -63,7 +66,11 @@ const RoomWorkArea = ({
             <CodeComponent socketRef={socketRef} />
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
-            <Whiteboard />
+            <Whiteboard
+            paths={paths}
+            setPaths={setPaths} 
+            socketRef={socketRef}
+            canvasRef={canvasRef} />
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
             <Meet tracks={tracks} />

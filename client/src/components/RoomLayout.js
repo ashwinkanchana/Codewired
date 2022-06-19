@@ -84,6 +84,13 @@ export default function RoomLayout({
   const client = useClient();
   const { ready, tracks } = useMicrophoneAndCameraTracks();
 
+  // scribble
+
+  const [paths, setPaths] = useState([]);
+  const canvasRef = useRef();
+
+  // scribble
+
   useEffect(() => {
     let init = async (name) => {
       client.on("user-published", async (user, mediaType) => {
@@ -212,6 +219,54 @@ export default function RoomLayout({
           payload: socketId,
         });
       });
+
+      socketRef.current.emit("join-drawing", {
+        name: uid,
+        drawingId: channelName,
+        color: "#000000",
+      });
+
+      socketRef.current.on("update-canvas", (updatedPath) => {
+        const newPath = [updatedPath, ...paths];
+        canvasRef.current.loadPaths(newPath);
+        setPaths(newPath);
+      });
+
+      socketRef.current.on("joined-drawing", ({ drawing, users }) => {
+        canvasRef?.current?.loadPaths(drawing);
+        setPaths(drawing);
+      });
+
+      socketRef.current.on("update-control", (updatedControl) => {
+        switch (updatedControl) {
+          case "undo":
+            const undo = canvasRef.current?.undo;
+            if (undo) {
+              undo();
+            }
+            break;
+          case "redo":
+            const redo = canvasRef.current?.redo;
+            if (redo) {
+              redo();
+            }
+            break;
+          case "clear":
+            const clearCanvas = canvasRef.current?.clearCanvas;
+            if (clearCanvas) {
+              clearCanvas();
+            }
+            break;
+          case "reset":
+            const resetCanvas = canvasRef.current?.resetCanvas;
+            if (resetCanvas) {
+              resetCanvas();
+            }
+            break;
+          default:
+            break;
+        }
+      });
     };
 
     init();
@@ -241,6 +296,9 @@ export default function RoomLayout({
         <DrawerHeader />
         <RoomWorkArea
           socketRef={socketRef}
+          canvasRef={canvasRef}
+          paths={paths}
+          setPaths={setPaths}
           tracks={tracks}
           tabValue={tabValue}
           setTabValue={setTabValue}
