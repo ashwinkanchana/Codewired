@@ -228,12 +228,12 @@ export default function RoomLayout({
 
       socketRef.current.on("update-canvas", (updatedPath) => {
         const newPath = [updatedPath, ...paths];
-        canvasRef.current.loadPaths(newPath);
+        canvasRef.current?.loadPaths(newPath);
         setPaths(newPath);
       });
 
       socketRef.current.on("joined-drawing", ({ drawing, users }) => {
-        canvasRef?.current?.loadPaths(drawing);
+        canvasRef.current?.loadPaths(drawing);
         setPaths(drawing);
       });
 

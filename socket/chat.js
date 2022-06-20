@@ -59,6 +59,10 @@ const chat = (io) => {
           user,
           text,
         });
+        io.to(socketUser.room).emit(
+          actions.ROOM_MEMBERS,
+          getRoomUsers(socketUser.room)
+        );
         addNewChatMessage(socketUser.room, text, user);
       }
     });
