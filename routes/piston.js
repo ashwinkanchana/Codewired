@@ -4,7 +4,13 @@ import piston from 'piston-client';
 import _ from 'lodash';
 
 const client = piston({ server: 'https://emkc.org' });
-import runtimes from '../config/runtimes.json' assert {type: "json"};
+
+import * as path from "path";
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import fs from 'fs'
+const runtimes = JSON.parse(fs.readFileSync(`${__dirname}/../config/runtimes.json`, 'utf-8'))
 
 router.get('/runtimes', async (req, res) => {
     const runtimes = await client.runtimes();
